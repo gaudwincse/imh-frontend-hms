@@ -1,0 +1,85 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header class="login-header">
+      <div class="icon-circle" [class.staff]="loginType() === 'staff'">
+        <mat-icon>{{
+          loginType() === "staff" ? "medical_services" : "person"
+        }}</mat-icon>
+      </div>
+      <mat-card-title>
+        {{ loginType() === "staff" ? "Staff Login" : "Patient Portal" }}
+      </mat-card-title>
+      <mat-card-subtitle
+        >Welcome back! Please enter your details.</mat-card-subtitle
+      >
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email or Username</mat-label>
+          <input
+            matInput
+            formControlName="email"
+            placeholder="Enter your email"
+          />
+          @if (isFieldInvalid("email")) {
+            <mat-error>Email is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+          />
+          @if (isFieldInvalid("password")) {
+            <mat-error>Password is required</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-options">
+          <a mat-button color="primary" href="#" class="forgot-password"
+            >Forgot password?</a
+          >
+        </div>
+
+        <button
+          mat-flat-button
+          type="submit"
+          class="btn-login"
+          [disabled]="isLoading()"
+          [class.is-loading]="isLoading()"
+        >
+          <span class="button-content">
+            @if (isLoading()) {
+              <mat-spinner diameter="24" strokeWidth="3"></mat-spinner>
+            } @else {
+              <mat-icon>login</mat-icon>
+              Sign In
+            }
+          </span>
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer class="switch-login">
+      @if (loginType() === "patient") {
+        <p>
+          Are you a staff member?
+          <button mat-button class="curs-hand" (click)="switchType('staff')">Staff Login</button>
+        </p>
+      } @else {
+        <p>
+          Are you a patient?
+          <button mat-button class="curs-hand" (click)="switchType('patient')">
+            Patient Login
+          </button>
+        </p>
+      }
+    </mat-card-footer>
+  </mat-card>
+</div>

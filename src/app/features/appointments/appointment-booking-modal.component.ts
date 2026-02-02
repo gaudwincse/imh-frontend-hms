@@ -28,7 +28,7 @@ import { PatientService, Patient } from '../../core/services/patient.service';
               <!-- Patient Selection -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Patient *</label>
-                <select 
+                <select
                   formControlName="patient_id"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
                   <option value="">Select Patient</option>
@@ -46,14 +46,14 @@ import { PatientService, Patient } from '../../core/services/patient.service';
               <!-- Doctor Selection -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Doctor *</label>
-                <select 
+                <select
                   formControlName="doctor_id"
                   (change)="onDoctorChange()"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
                   <option value="">Select Doctor</option>
                   @for (doctor of doctors(); track doctor.id) {
                     <option [value]="doctor.id">
-                      {{ doctor.user?.name }} - {{ doctor.specialization }}
+                      {{ doctor.user.name }} - {{ doctor.specialization }}
                     </option>
                   }
                 </select>
@@ -65,7 +65,7 @@ import { PatientService, Patient } from '../../core/services/patient.service';
               <!-- Branch Selection -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Branch *</label>
-                <select 
+                <select
                   formControlName="branch_id"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
                   <option value="">Select Branch</option>
@@ -80,7 +80,7 @@ import { PatientService, Patient } from '../../core/services/patient.service';
               <!-- Appointment Type -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Appointment Type *</label>
-                <select 
+                <select
                   formControlName="type"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
                   <option value="">Select Type</option>
@@ -97,7 +97,7 @@ import { PatientService, Patient } from '../../core/services/patient.service';
               <!-- Symptoms -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Symptoms</label>
-                <textarea 
+                <textarea
                   formControlName="symptoms"
                   rows="3"
                   placeholder="Describe patient's symptoms..."
@@ -107,7 +107,7 @@ import { PatientService, Patient } from '../../core/services/patient.service';
               <!-- Notes -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
-                <textarea 
+                <textarea
                   formControlName="notes"
                   rows="2"
                   placeholder="Any additional information..."
@@ -120,8 +120,8 @@ import { PatientService, Patient } from '../../core/services/patient.service';
               <!-- Appointment Date -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Appointment Date *</label>
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   formControlName="appointment_date"
                   (change)="onDateChange()"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
@@ -138,7 +138,7 @@ import { PatientService, Patient } from '../../core/services/patient.service';
                     <div class="space-y-2">
                       <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-2">
                         @for (slot of availability()?.slots || []; track slot.start) {
-                          <div 
+                          <div
                             class="p-2 border rounded cursor-pointer hover:bg-blue-50 mb-1"
                             [ngClass]="{'bg-blue-100 border-blue-500': selectedSlot() === slot.start}"
                             (click)="selectTimeSlot(slot)">
@@ -198,13 +198,13 @@ import { PatientService, Patient } from '../../core/services/patient.service';
 
           <!-- Form Actions -->
           <div class="flex justify-end space-x-3 mt-6 pt-6 border-t">
-            <button 
+            <button
               type="button"
               (click)="hideModal()"
               class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
               Cancel
             </button>
-            <button 
+            <button
               type="submit"
               [disabled]="bookingForm.invalid || loading()"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
@@ -312,7 +312,7 @@ export class AppointmentBookingModalComponent {
   onDoctorChange() {
     const doctorId = this.bookingForm.get('doctor_id')?.value;
     const date = this.bookingForm.get('appointment_date')?.value;
-    
+
     if (doctorId && date) {
       this.checkAvailability(doctorId, date);
     } else {
@@ -324,7 +324,7 @@ export class AppointmentBookingModalComponent {
   onDateChange() {
     const doctorId = this.bookingForm.get('doctor_id')?.value;
     const date = this.bookingForm.get('appointment_date')?.value;
-    
+
     if (doctorId && date) {
       this.checkAvailability(doctorId, date);
     } else {
@@ -335,7 +335,7 @@ export class AppointmentBookingModalComponent {
 
   checkAvailability(doctorId: number, date: string) {
     this.loadingAvailability.set(true);
-    
+
     this.appointmentService.getAvailability({ doctor_id: doctorId, date }).subscribe({
       next: (response: any) => {
         this.availability.set(response.data);

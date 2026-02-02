@@ -6,7 +6,8 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { DoctorListComponent } from './features/doctors/doctor-list.component';
 import { PatientListComponent } from './features/patients/patient-list.component';
 import { AppointmentListComponent } from './features/appointments/appointment-list.component';
-import { LoginComponent } from './features/auth/login.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { AddDoctorComponent } from './features/doctors/add-doctor.component';
 
 export const routes: Routes = [
     { path: '', component: DentalLandingComponent },
@@ -16,7 +17,7 @@ export const routes: Routes = [
     // Public routes
     { path: 'login', component: LoginComponent },
     { path: 'admin/login', component: LoginComponent },
-    { path: 'super-admin', loadComponent: () => import('./features/auth/admin-login.component').then(m => m.AdminLoginComponent) },
+    { path: 'super-admin', loadComponent: () => import('./features/auth/admin-login/admin-login.component').then(m => m.AdminLoginComponent) },
 
     // Protected routes with admin layout
     {
@@ -25,6 +26,7 @@ export const routes: Routes = [
         children: [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'doctors', component: DoctorListComponent },
+            { path: 'doctors/add', component: AddDoctorComponent },
             { path: 'departments/:id', component: DoctorListComponent }, // Demo route for departments
             { path: 'patients', component: PatientListComponent },
             { path: 'appointments', component: AppointmentListComponent },
@@ -39,6 +41,7 @@ export const routes: Routes = [
             { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
             { path: 'dashboard', component: DashboardComponent },
             { path: 'doctors', component: DoctorListComponent },
+            { path: 'doctors/add', component: AddDoctorComponent },
             { path: 'patients', component: PatientListComponent },
             { path: 'appointments', component: AppointmentListComponent },
             { path: 'lab-analytics', loadComponent: () => import('./features/lab-results/lab-results-analytics.component').then(m => m.LabResultsAnalyticsComponent) },

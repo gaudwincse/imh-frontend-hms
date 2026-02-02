@@ -1,0 +1,236 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
+
+:host {
+  font-family: "Outfit", sans-serif;
+  --primary: #34d399;
+  --secondary: #0ea5e9;
+  --text-dark: #0f172a;
+  --text-light: #64748b;
+  --bg-gradient: linear-gradient(160deg, #a7f3d0 0%, #34d399 100%);
+  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.12);
+
+  display: block;
+  width: 100%;
+
+  // Overriding Material's internal typography for this component
+  --mat-sys-title-large-font: "Outfit", sans-serif;
+  --mat-sys-body-medium-font: "Outfit", sans-serif;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  padding: 1rem;
+}
+
+// ============================================
+// MATERIAL CARD OVERRIDES
+// ============================================
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.85) !important; // Glass effect
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 24px !important;
+  padding: 2.5rem !important;
+  box-shadow: var(--shadow-lg) !important;
+  transition: var(--transition);
+
+  &:hover {
+    box-shadow: 0 30px 60px rgba(0, 48, 73, 0.15) !important;
+  }
+}
+
+.login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .icon-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(14, 165, 233, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: var(--secondary);
+
+    &.staff {
+      color: var(--secondary);
+    }
+    &.patient {
+      color: var(--primary);
+      background: rgba(52, 211, 153, 0.1);
+    }
+
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  mat-card-title {
+    font-size: 1.8rem !important;
+    font-weight: 700 !important;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+  }
+}
+
+// ============================================
+// FORM FIELD STYLING
+// ============================================
+.full-width {
+  width: 100%;
+  margin-bottom: 0.5rem;
+
+  ::ng-deep {
+    // 1. Remove that vertical line (the right border of the leading edge)
+    .mdc-notched-outline__leading {
+      border-right: none !important;
+      // Optional: adjust width to pull the left border closer/further
+      // width: 12px !important;
+    }
+
+    // 2. Ensure the notch (where the label sits) doesn't have a left border
+    .mdc-notched-outline__notch {
+      border-left: none !important;
+    }
+
+    // 3. Keep your existing color logic but apply it to the MDC parts
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: rgba(15, 23, 42, 0.1) !important;
+    }
+
+    // 4. Focus state handling
+    &:focus-within {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: var(--secondary) !important;
+        border-width: 2px !important;
+      }
+    }
+
+    // 5. Fix for label alignment (Optional: helps if text looks shifted)
+    .mat-mdc-form-field-flex {
+      align-items: center !important;
+    }
+  }
+}
+
+// ============================================
+// BUTTONS & ACTIONS
+// ============================================
+.btn-login {
+  width: 100%;
+  height: 52px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, var(--primary) 0%, #0284c7 100%) !important;
+  margin-top: 1rem;
+  color: white !important;
+  cursor: pointer !important;
+
+  // This targets the actual internal container of the Material Button
+  ::ng-deep .mdc-button__label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100%;
+    height: 100%;
+  }
+
+  // Ensure the custom span doesn't create a new block
+  .button-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; // Space between icon and text
+  }
+
+  mat-icon {
+    margin: 0 !important;
+    display: inline-flex !important;
+    vertical-align: middle;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5rem 0 1.5rem;
+
+  mat-checkbox {
+    --mdc-checkbox-selected-icon-color: var(--secondary);
+    --mdc-checkbox-selected-focus-icon-color: var(--secondary);
+    --mdc-checkbox-selected-hover-icon-color: var(--secondary);
+  }
+}
+
+.curs-hand {
+  cursor: pointer;
+}
+
+.switch-login {
+  margin-top: 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  padding-top: 1.5rem;
+  overflow: hidden; // Keeps the animation contained
+
+  p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  button {
+    font-weight: 700;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+
+    &:hover {
+      background: rgba(14, 165, 233, 0.05);
+      letter-spacing: 1px; // Subly grows on hover
+    }
+  }
+}
+
+// Keyframe for the "Animatic" feel
+.animate-switch {
+  animation: slideInUp 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

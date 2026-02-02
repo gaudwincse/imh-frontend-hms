@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DoctorService, Doctor, DoctorSearchParams } from '../../core/services/doctor.service';
@@ -42,7 +42,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             <button 
               mat-raised-button 
               color="accent" 
-              (click)="createDoctor()"
+              (click)="navigateToAddDoctor()"
               *ngIf="authService.hasPermission('create_doctors')"
             >
               <mat-icon>add</mat-icon>
@@ -286,8 +286,9 @@ export class DoctorListComponent implements OnInit {
   loadSpecializations(): void {
     this.doctorService.getSpecializations().subscribe({
       next: (response) => {
-        this.specializations.set(response.data || []);
-        console.log('📋 Specializations loaded:', response.data);
+        const specs = (response.data || []).map(s => s.name);
+        this.specializations.set(specs);
+        console.log('📋 Specializations loaded:', specs);
       },
       error: (err) => {
         console.error('❌ Error loading specializations:', err);
@@ -339,8 +340,8 @@ export class DoctorListComponent implements OnInit {
     this.router.navigate(['/doctors', id, 'edit']);
   }
 
-  createDoctor(): void {
-    this.router.navigate(['/doctors', 'create']);
+  navigateToAddDoctor(): void {
+    this.router.navigate(['/doctors/add']);
   }
 
   deleteDoctor(id: number): void {
