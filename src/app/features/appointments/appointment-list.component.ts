@@ -154,7 +154,7 @@ import { AppointmentBookingModalComponent } from './appointment-booking-modal.co
         <div *ngIf="meta().total > 0" class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
           <div class="text-sm text-gray-700">
             Showing <span class="font-medium">{{ (meta().current_page - 1) * meta().per_page + 1 }}</span> to 
-            <span class="font-medium">{{ Math.min(meta().current_page * meta().per_page, meta().total) }}</span> of 
+            <span class="font-medium">{{ getToNumber() }}</span> of 
             <span class="font-medium">{{ meta().total }}</span> appointments
           </div>
           <div class="flex space-x-2">
@@ -176,7 +176,7 @@ import { AppointmentBookingModalComponent } from './appointment-booking-modal.co
     </div>
 
     <!-- Appointment Booking Modal -->
-    <app-appointment-booking-modal (appointmentBooked)="onAppointmentBooked($event)" (close)="onBookingModalClosed()"></app-appointment-booking-modal>
+    <app-appointment-booking-modal (appointmentBooked)="onAppointmentBooked()" (close)="onBookingModalClosed()"></app-appointment-booking-modal>
   `,
 })
 export class AppointmentListComponent implements OnInit {
@@ -187,10 +187,10 @@ export class AppointmentListComponent implements OnInit {
   searchQuery = '';
   filters: AppointmentSearchParams = {
     per_page: 15,
-    status: '',
-    type: '',
-    filter: '',
-    date_from: ''
+    status: undefined,
+    type: undefined,
+    filter: undefined,
+    date_from: undefined
   };
 
   constructor(
@@ -209,7 +209,7 @@ export class AppointmentListComponent implements OnInit {
     const params: AppointmentSearchParams = {
       ...this.filters,
       page,
-      per_page: this.filters.per_page
+      per_page: this.filters.per_page!
     };
 
     if (this.searchQuery) {
@@ -309,8 +309,8 @@ export class AppointmentListComponent implements OnInit {
     return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
 
-  getStatusClass(status: string): object {
-    const statusClasses = {
+  getStatusClass(status: string): string {
+    const statusClasses: Record<string, string> = {
       'scheduled': 'bg-yellow-100 text-yellow-800',
       'confirmed': 'bg-blue-100 text-blue-800',
       'in_progress': 'bg-purple-100 text-purple-800',
@@ -322,11 +322,19 @@ export class AppointmentListComponent implements OnInit {
     return statusClasses[status] || 'bg-gray-100 text-gray-800';
   }
 
+  getToNumber(): number {
+    const current = this.meta().current_page;
+    const perPage = this.meta().per_page;
+    const total = this.meta().total;
+    const to = current * perPage;
+    return to > total ? total : to;
+  }
+
   trackByAppointmentId(index: number, appointment: Appointment) {
     return appointment.id;
   }
 
-  onAppointmentBooked(appointment: Appointment) {
+  onAppointmentBooked() {
     this.loadAppointments(1);
   }
 

@@ -17,8 +17,10 @@ export interface AuthUser {
 }
 
 export interface LoginResponse {
-  token: string;
-  user: AuthUser;
+  access_token?: string;
+  token_type?: string;
+  expires_in?: number;
+  user?: AuthUser;
 }
 
 @Injectable({
@@ -37,8 +39,10 @@ export class AuthService {
       .post<LoginResponse>('/api/auth/login', payload)
       .pipe(
         tap((res) => {
-          localStorage.setItem('auth_token', res.token);
-          this.userSignal.set(res.user);
+          if (res.access_token && res.user) {
+            localStorage.setItem('auth_token', res.access_token);
+            this.userSignal.set(res.user);
+          }
         })
       );
   }
@@ -55,5 +59,15 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.userSignal();
+  }
+
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('auth_token');
+    return !!token && !!this.userSignal();
+  }
+
+  isAdmin(): boolean {
+    const user = this.userSignal();
+    return user?.roles?.includes('administrator') || user?.roles?.includes('super_admin') || false;
   }
 }

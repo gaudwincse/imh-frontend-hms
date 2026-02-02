@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Appointment {
@@ -57,6 +57,9 @@ export interface AppointmentSearchParams {
   date_to?: string;
   filter?: 'today' | 'this_week' | 'this_month' | 'upcoming' | 'past';
   per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
 }
 
 export interface PaginatedResponse<T> {
@@ -103,7 +106,16 @@ export class AppointmentService {
   constructor(private http: HttpClient) {}
 
   getAppointments(params?: AppointmentSearchParams): Observable<PaginatedResponse<Appointment>> {
-    return this.http.get<PaginatedResponse<Appointment>>('/api/appointments', { params });
+    const httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof AppointmentSearchParams];
+        if (value !== undefined && value !== null) {
+          httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<PaginatedResponse<Appointment>>('/api/appointments', { params: httpParams });
   }
 
   getAppointment(id: number): Observable<{ data: Appointment }> {
@@ -119,7 +131,7 @@ export class AppointmentService {
   }
 
   cancelAppointment(id: number): Observable<{ message: string }> {
-    return this.http.patch<{ message: string }>(`/api/appointments/${id}/cancel`);
+    return this.http.patch<{ message: string }>(`/api/appointments/${id}/cancel`, {});
   }
 
   getAvailability(params: {
@@ -127,6 +139,13 @@ export class AppointmentService {
     date: string;
     duration_minutes?: number;
   }): Observable<AppointmentAvailability> {
-    return this.http.get<AppointmentAvailability>('/api/appointments/availability', { params });
+    const httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      const value = params[key as keyof typeof params];
+      if (value !== undefined && value !== null) {
+        httpParams.set(key, value.toString());
+      }
+    });
+    return this.http.get<AppointmentAvailability>('/api/appointments/availability', { params: httpParams });
   }
 }

@@ -1,0 +1,269 @@
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" *ngIf="visible()">
+  <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-3/4 shadow-lg rounded-lg bg-white max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-gray-900">
+        {{ isEditMode() ? 'Edit Prescription' : 'New Prescription' }}
+      </h2>
+      <button (click)="close()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="text-center py-8">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <p class="mt-2 text-gray-600">{{ isEditMode() ? 'Updating...' : 'Creating...' }} prescription</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error()" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <div class="text-red-800">{{ error() }}</div>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="prescriptionForm" (ngSubmit)="onSubmit()" *ngIf="!loading()">
+      <!-- Patient Info -->
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Patient Information</h3>
+
+        <div class="text-sm text-gray-600 mb-2">{{ patient()?.first_name }} {{ patient()?.last_name }}</div>
+        <div class="text-sm text-gray-600">ID: {{ patient()?.patient_no }}</div>
+        <div class="text-sm text-gray-600">Age: {{ calculateAge(patient()?.date_of_birth) }} years</div>
+      </div>
+
+      <!-- Doctor Selection -->
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Doctor Information</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Doctor *</label>
+            <select
+              formControlName="doctor_id"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              (change)="onDoctorChange()">
+              <option value="">Select Doctor</option>
+              @for (doctor of doctors(); track doctor.id) {
+                <option [value]="doctor.id">{{ doctor.user?.name }} - {{ doctor.specialization }}</option>
+              }
+            </select>
+            <div *ngIf="prescriptionForm.get('doctor_id')?.invalid && prescriptionForm.get('doctor_id')?.touched" class="text-red-600 text-sm mt-1">
+              Doctor is required
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Consultation Fee</label>
+            <div class="text-gray-900">${ selectedDoctor()?.consultation_fee || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prescription Details -->
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Prescription Details</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Issue Date *</label>
+            <input
+              type="date"
+              formControlName="issue_date"
+              (change)="onDateChange()"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <div *ngIf="prescriptionForm.get('issue_date')?.invalid && prescriptionForm.get('issue_date')?.touched" class="text-red-600 text-sm mt-1">
+              Issue date is required
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date *</label>
+            <input
+              type="date"
+              formControlName="expiry_date"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <div *ngIf="prescriptionForm.get('expiry_date')?.invalid && prescriptionForm.get('expiry_date')?.touched" class="text-red-600 text-sm mt-1">
+              Expiry date is required
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Diagnosis *</label>
+          <textarea
+            formControlName="diagnosis"
+            rows="4"
+            placeholder="Clinical diagnosis and findings..."
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </textarea>
+          <div *ngIf="prescriptionForm.get('diagnosis')?.invalid && prescriptionForm.get('diagnosis')?.touched" class="text-red-600 text-sm mt-1">
+            Diagnosis is required
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+          <textarea
+            formControlName="notes"
+            rows="3"
+            placeholder="Additional notes..."
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- Prescription Items -->
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Prescription Items</h3>
+          <button
+            type="button"
+            (click)="addPrescriptionItem()"
+            class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            + Add Medication
+          </button>
+        </div>
+
+        <div formArrayName="items">
+          @for (itemGroup of formArray.controls; let i = index; track i) {
+            <div class="bg-white rounded-lg p-4 border border-gray-200 mb-4">
+              <div [formGroupName]="i">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Medication *</label>
+                    <input
+                      type="text"
+                      formControlName="medicine_name"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
+                    <input
+                      type="text"
+                      formControlName="dosage"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                    <select
+                      formControlName="frequency"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                      <option value="once_daily">Once daily</option>
+                      <option value="twice_daily">Twice daily</option>
+                      <option value="three_times_daily">Three times daily</option>
+                      <option value="four_times_daily">Four times daily</option>
+                      <option value="every_4_hours">Every 4 hours</option>
+                      <option value="every_6_hours">Every 6 hours</option>
+                      <option value="every_8_hours">Every 8 hours</option>
+                      <option value="every_12_hours">Every 12 hours</option>
+                      <option value="as_needed">As needed</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Duration (days)</label>
+                    <input
+                      type="number"
+                      formControlName="duration_days"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      min="1">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                    <input
+                      type="number"
+                      formControlName="quantity"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      min="1">
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Unit Price ($)</label>
+                    <input
+                      type="number"
+                      formControlName="unit_price"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      min="0"
+                      step="0.01">
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
+                  <textarea
+                    formControlName="instructions"
+                    rows="2"
+                    placeholder="Dosage instructions..."
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  </textarea>
+                </div>
+
+                <div class="flex justify-end">
+                  <button
+                    type="button"
+                    (click)="removePrescriptionItem(i)"
+                    class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (formArray.length === 0) {
+          <div class="text-center py-8 text-gray-600">
+            <p class="text-lg font-medium">No prescription items added yet. Click "Add Medication" to get started.</p>
+          </div>
+        }
+      </div>
+
+      <!-- Totals -->
+      <div class="bg-gray-100 p-4 rounded-lg mb-6">
+        <div class="flex justify-between items-center">
+          <span class="text-lg font-semibold">Total Cost:</span>
+          <span class="text-lg font-bold text-blue-600">${{ getTotalCost().toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end space-x-3 mt-6 pt-6 border-t">
+        <button
+          type="button"
+          (click)="close()"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="prescriptionForm.invalid || loading()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
+          {{ isEditMode() ? 'Update' : 'Create' }} Prescription
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Success/Error Messages -->
+@if (successMessage()) {
+  <div class="fixed bottom-4 right-4 z-50">
+    <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
+      <div class="text-white font-medium">{{ successMessage() }}</div>
+    </div>
+  </div>
+}
+
+@if (errorMessage()) {
+  <div class="fixed bottom-4 right-4 z-50">
+    <div class="bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
+      <div class="text-white font-medium">{{ errorMessage() }}</div>
+    </div>
+  </div>
+}

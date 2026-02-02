@@ -109,7 +109,7 @@ import { PatientRegistrationComponent } from './patient-registration.component';
         <div *ngIf="meta().total > 0" class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
           <div class="text-sm text-gray-700">
             Showing <span class="font-medium">{{ (meta().current_page - 1) * meta().per_page + 1 }}</span> to 
-            <span class="font-medium">{{ Math.min(meta().current_page * meta().per_page, meta().total) }}</span> of 
+            <span class="font-medium">{{ getToNumber() }}</span> of 
             <span class="font-medium">{{ meta().total }}</span> results
           </div>
           <div class="flex space-x-2">
@@ -144,8 +144,8 @@ export class PatientListComponent implements OnInit {
   searchQuery = '';
   filters: PatientSearchParams = {
     per_page: 15,
-    status: '',
-    gender: ''
+    status: undefined,
+    gender: undefined
   };
   constructor(
     private patientService: PatientService,
@@ -163,7 +163,7 @@ export class PatientListComponent implements OnInit {
     const params: PatientSearchParams = {
       ...this.filters,
       page,
-      per_page: this.filters.per_page
+      per_page: this.filters.per_page!
     };
 
     if (this.searchQuery) {
@@ -223,5 +223,13 @@ export class PatientListComponent implements OnInit {
 
   onPatientRegistered(patient: Patient) {
     this.loadPatients(1);
+  }
+
+  getToNumber(): number {
+    const current = this.meta().current_page;
+    const perPage = this.meta().per_page;
+    const total = this.meta().total;
+    const to = current * perPage;
+    return to > total ? total : to;
   }
 }

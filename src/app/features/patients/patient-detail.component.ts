@@ -1,14 +1,14 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PatientService, Patient, CreatePatientData } from '../../core/services/patient.service';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-patient-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, DatePipe],
   template: `
     <div class="p-6">
       <!-- Header -->
@@ -290,19 +290,29 @@ import { AuthService } from '../../core/services/auth.service';
           <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
             <div class="space-y-2">
-              <button class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <button 
+                (click)="viewMedicalRecords()"
+                class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 📋 View Medical History
               </button>
-              <button class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <button 
+                (click)="viewPrescriptions()"
+                class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 💊 Manage Prescriptions
               </button>
-              <button class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <button 
+                (click)="scheduleAppointment()"
+                class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 📅 Schedule Appointment
               </button>
-              <button class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <button 
+                (click)="viewLabResults()"
+                class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 🧪 View Lab Results
               </button>
-              <button class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <button 
+                (click)="viewInvoices()"
+                class="w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 💳 Billing History
               </button>
             </div>
@@ -425,6 +435,26 @@ export class PatientDetailComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/patients']);
+  }
+
+  viewMedicalRecords() {
+    this.router.navigate(['/patients', this.patient()!.id, 'medical-records']);
+  }
+
+  viewPrescriptions() {
+    this.router.navigate(['/patients', this.patient()!.id, 'prescriptions']);
+  }
+
+  scheduleAppointment() {
+    this.router.navigate(['/appointments'], { queryParams: { patient_id: this.patient()!.id } });
+  }
+
+  viewLabResults() {
+    this.router.navigate(['/patients', this.patient()!.id, 'lab-results']);
+  }
+
+  viewInvoices() {
+    this.router.navigate(['/patients', this.patient()!.id, 'invoices']);
   }
 
   formatDate(dateString: string): string {

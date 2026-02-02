@@ -4,10 +4,11 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { branchInterceptor } from './core/interceptors/branch.interceptor';
 import { tokenInterceptor } from './core/interceptors/jwt.interceptor';
+import { apiUrlInterceptor } from './core/interceptors/api-url.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(withInterceptors([tokenInterceptor, branchInterceptor])),
+    provideHttpClient(withInterceptors([apiUrlInterceptor, tokenInterceptor, branchInterceptor])),
     provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes)
   ]
 };

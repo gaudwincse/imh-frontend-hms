@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Doctor {
@@ -16,6 +16,16 @@ export interface Doctor {
   status: 'active' | 'on_leave' | 'resigned';
   created_at: string;
   updated_at: string;
+  phone?: string;
+  license_number?: string;
+  qualifications?: string;
+  is_active?: boolean;
+  working_hours?: {
+    days?: string;
+    hours?: string;
+    break?: string;
+    max_appointments?: number;
+  };
   user?: {
     id: number;
     name: string;
@@ -34,6 +44,9 @@ export interface DoctorSearchParams {
   branch_id?: number;
   available_today?: boolean;
   per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
 }
 
 export interface PaginatedResponse<T> {
@@ -76,12 +89,29 @@ export class DoctorService {
   constructor(private http: HttpClient) {}
 
   getDoctors(params?: DoctorSearchParams): Observable<PaginatedResponse<Doctor>> {
-    return this.http.get<PaginatedResponse<Doctor>>('/api/doctors', { params });
+    const httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof DoctorSearchParams];
+        if (value !== undefined && value !== null) {
+          httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<PaginatedResponse<Doctor>>('/api/doctors', { params: httpParams });
   }
 
   getAvailableDoctors(params?: DoctorSearchParams): Observable<PaginatedResponse<Doctor>> {
+    const httpParams = new HttpParams();
+    const allParams = { ...params, available_today: true };
+    Object.keys(allParams).forEach(key => {
+      const value = allParams[key as keyof typeof allParams];
+      if (value !== undefined && value !== null) {
+        httpParams.set(key, value.toString());
+      }
+    });
     return this.http.get<PaginatedResponse<Doctor>>('/api/doctors/available', { 
-      params: { ...params, available_today: true }
+      params: httpParams
     });
   }
 

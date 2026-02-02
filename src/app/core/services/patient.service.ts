@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Patient {
@@ -48,6 +48,9 @@ export interface PatientSearchParams {
   created_from?: string;
   created_to?: string;
   per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
 }
 
 export interface PaginatedResponse<T> {
@@ -90,11 +93,29 @@ export class PatientService {
   constructor(private http: HttpClient) {}
 
   getPatients(params?: PatientSearchParams): Observable<PaginatedResponse<Patient>> {
-    return this.http.get<PaginatedResponse<Patient>>('/api/patients', { params });
+    const httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof PatientSearchParams];
+        if (value !== undefined && value !== null) {
+          httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<PaginatedResponse<Patient>>('/api/patients', { params: httpParams });
   }
 
   searchPatients(params: PatientSearchParams): Observable<PaginatedResponse<Patient>> {
-    return this.http.get<PaginatedResponse<Patient>>('/api/patients/search', { params });
+    const httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof PatientSearchParams];
+        if (value !== undefined && value !== null) {
+          httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<PaginatedResponse<Patient>>('/api/patients/search', { params: httpParams });
   }
 
   getPatient(id: number): Observable<{ data: Patient }> {

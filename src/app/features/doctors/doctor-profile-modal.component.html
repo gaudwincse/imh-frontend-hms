@@ -1,0 +1,114 @@
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" *ngIf="visible()">
+  <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-lg bg-white max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-gray-900">Doctor Profile</h2>
+      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    @if (doctor()) {
+      <!-- Doctor Information -->
+      <div class="space-y-6">
+        <!-- Basic Info -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-600">Name</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.user?.name || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Email</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.user?.email || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Specialization</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.specialization || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Consultation Fee</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.consultation_fee || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Phone</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.phone || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Status</p>
+              <span class="px-2 py-1 text-xs font-medium rounded-full"
+                [ngClass]="doctor()?.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                {{ doctor()?.is_active ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Details -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Professional Details</h3>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-600">License Number</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.license_number || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Experience</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.experience_years || 0 }} years</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Qualifications</p>
+              <p class="font-medium text-gray-900">{{ doctor()?.qualifications || 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Schedule -->
+        @if (doctor()?.working_hours) {
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Working Schedule</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm text-gray-600">Working Days</p>
+                <p class="font-medium text-gray-900">{{ doctor()?.working_hours?.days || 'N/A' }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Working Hours</p>
+                <p class="font-medium text-gray-900">{{ doctor()?.working_hours?.hours || 'N/A' }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Break Time</p>
+                <p class="font-medium text-gray-900">{{ doctor()?.working_hours?.break || 'N/A' }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Max Appointments</p>
+                <p class="font-medium text-gray-900">{{ doctor()?.working_hours?.max_appointments || 'N/A' }}</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="flex justify-end space-x-3 pt-6 border-t">
+          <button 
+            (click)="closeModal()"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            Close
+          </button>
+          <button 
+            (click)="bookAppointment()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Book Appointment
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center py-8 text-gray-600">
+        <p>No doctor information available</p>
+      </div>
+    }
+  </div>
+</div>
