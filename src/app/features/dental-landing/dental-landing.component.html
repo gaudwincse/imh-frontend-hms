@@ -1,0 +1,170 @@
+<!-- Navigation -->
+<nav class="navbar" [class.scrolled]="isScrolled">
+    <div class="container navbar-container">
+        <div class="logo">
+            <lucide-icon [name]="Smile" class="logo-icon"></lucide-icon>
+            <span class="logo-text">Bright<span>Dental</span></span>
+        </div>
+
+        <ul class="nav-links" [class.active]="isMobileMenuOpen">
+            <li><a href="#home" (click)="isMobileMenuOpen = false">Home</a></li>
+            <li><a href="#about" (click)="isMobileMenuOpen = false">About</a></li>
+            <li><a href="#services" (click)="isMobileMenuOpen = false">Services</a></li>
+            <li><a href="#contact" (click)="isMobileMenuOpen = false">Contact</a></li>
+            <li class="nav-cta-group">
+                <a [routerLink]="['/login']" [queryParams]="{type: 'patient'}" class="btn btn-outline-primary">Patient
+                    Portal</a>
+                <a [routerLink]="['/login']" [queryParams]="{type: 'staff'}" class="btn btn-primary">Staff Login</a>
+            </li>
+        </ul>
+
+        <button class="menu-toggle" (click)="toggleMobileMenu()">
+            <lucide-icon [name]="isMobileMenuOpen ? X : Menu"></lucide-icon>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="hero-text">
+            <span class="badge">Your Smile, Our Priority</span>
+            <h1>Experience Premium <span>Dental</span> Care</h1>
+            <p>A healthier, brighter smile starts here. Our expert team uses state-of-the-art technology to provide
+                comfortable and professional dental treatments.</p>
+            <div class="hero-btns">
+                <a [routerLink]="['/login']" [queryParams]="{type: 'patient'}" class="btn btn-primary">Book Consultation
+                    <lucide-icon [name]="ArrowRight"></lucide-icon></a>
+                <a href="#" class="btn btn-outline">Our Dental Services</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="stats-bar">
+    <div class="container stats-grid">
+        <div class="stat-item">
+            <h3>20+</h3>
+            <p>Years in Dentistry</p>
+        </div>
+        <div class="stat-item">
+            <h3>15+</h3>
+            <p>Expert Dentists</p>
+        </div>
+        <div class="stat-item">
+            <h3>15k+</h3>
+            <p>Happy Smiles</p>
+        </div>
+        <div class="stat-item">
+            <h3>0%</h3>
+            <p>Pain Guarantee</p>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about section">
+    <div class="container about-grid">
+        <div class="about-image">
+            <img src="assets/dental-about.png" alt="Dental Care">
+            <div class="experience-card">
+                <h4>Top</h4>
+                <span>Rated Clinic 2025</span>
+            </div>
+        </div>
+        <div class="about-text">
+            <span class="section-subtitle">Why Choose Us</span>
+            <h2 class="section-title">We Provide Advanced Dental Care Solutions</h2>
+            <p>At Bright Dental, we believe everyone deserves a beautiful smile. Our clinic is equipped with the latest
+                dental technology to ensure painless and effective treatments.</p>
+
+            <ul class="about-features">
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> Digital X-Rays & Imaging</li>
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> Painless Fillings & Root Canals</li>
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> Sterilized High-Tech Lab</li>
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> Same-Day Emergencies</li>
+            </ul>
+
+            <a href="#" class="btn btn-primary">Our Philosophy</a>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="services section light-bg">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-subtitle">Dental Services</span>
+            <h2 class="section-title">Specialized Dental Care</h2>
+        </div>
+
+        <div class="services-grid">
+            @for (service of services; track $index) {
+            <div class="service-card">
+                <div class="service-icon">
+                    <lucide-icon [name]="service.icon"></lucide-icon>
+                </div>
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+                <a href="#" class="read-more">Learn More <lucide-icon [name]="ArrowRight"></lucide-icon></a>
+            </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="contact" class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col about-col">
+                <div class="logo">
+                    <lucide-icon [name]="Smile" class="logo-icon"></lucide-icon>
+                    <span class="logo-text">Bright<span>Dental</span></span>
+                </div>
+                <p>Your destination for premium dental healthcare. We are committed to providing the highest quality
+                    treatments in a relaxing environment.</p>
+                <div class="social-links">
+                    <a href="#"><lucide-icon [name]="Facebook"></lucide-icon></a>
+                    <a href="#"><lucide-icon [name]="Twitter"></lucide-icon></a>
+                    <a href="#"><lucide-icon [name]="Instagram"></lucide-icon></a>
+                    <a href="#"><lucide-icon [name]="Linkedin"></lucide-icon></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Treatments</h4>
+                <ul>
+                    <li><a href="#">Orthodontics</a></li>
+                    <li><a href="#">Dental Implants</a></li>
+                    <li><a href="#">Teeth Whitening</a></li>
+                    <li><a href="#">Cleaning & Hygiene</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <ul class="contact-info">
+                    <li><lucide-icon [name]="MapPin"></lucide-icon> 456 Smile Blvd, CA</li>
+                    <li><lucide-icon [name]="Phone"></lucide-icon> +1 (555) 987-6543</li>
+                    <li><lucide-icon [name]="Mail"></lucide-icon> hello&#64;brightdental.com</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Open Hours</h4>
+                <ul class="hours">
+                    <li><span>Mon - Fri:</span> 9:00 - 18:00</li>
+                    <li><span>Saturday:</span> 10:00 - 16:00</li>
+                    <li><span>Sunday:</span> Closed</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Bright Dental Clinic. Reclaiming your smile.</p>
+        </div>
+    </div>
+</footer>

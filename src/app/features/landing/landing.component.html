@@ -1,0 +1,165 @@
+<!-- Navigation -->
+<nav class="navbar" [class.scrolled]="isScrolled">
+    <div class="container navbar-container">
+        <div class="logo">
+            <lucide-icon [name]="Heart" class="logo-icon"></lucide-icon>
+            <span class="logo-text">Hope<span>Medical</span></span>
+        </div>
+
+        <ul class="nav-links" [class.active]="isMobileMenuOpen">
+            <li><a href="#home" (click)="isMobileMenuOpen = false">Home</a></li>
+            <li><a href="#about" (click)="isMobileMenuOpen = false">About</a></li>
+            <li><a href="#services" (click)="isMobileMenuOpen = false">Services</a></li>
+            <li><a href="#contact" (click)="isMobileMenuOpen = false">Contact</a></li>
+            <li class="nav-cta"><a href="#" class="btn btn-primary">Appointment</a></li>
+        </ul>
+
+        <button class="menu-toggle" (click)="toggleMobileMenu()">
+            <lucide-icon [name]="isMobileMenuOpen ? X : Menu"></lucide-icon>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="hero-text">
+            <span class="badge">Welcome to Hope Medical</span>
+            <h1>We Care About Your <span>Health</span> Always</h1>
+            <p>Providing the highest quality healthcare with a human touch. Our medical professionals are dedicated to
+                your well-being around the clock.</p>
+            <div class="hero-btns">
+                <a href="#" class="btn btn-primary">Book Now <lucide-icon [name]="ArrowRight"></lucide-icon></a>
+                <a href="#" class="btn btn-outline">Our Services</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="stats-bar">
+    <div class="container stats-grid">
+        <div class="stat-item">
+            <h3>15+</h3>
+            <p>Years Experience</p>
+        </div>
+        <div class="stat-item">
+            <h3>120+</h3>
+            <p>Specialist Doctors</p>
+        </div>
+        <div class="stat-item">
+            <h3>10k+</h3>
+            <p>Happy Patients</p>
+        </div>
+        <div class="stat-item">
+            <h3>50+</h3>
+            <p>Modern Rooms</p>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about section">
+    <div class="container about-grid">
+        <div class="about-image">
+            <img src="assets/about-img.png" alt="Medical Office">
+            <div class="experience-card">
+                <h4>15+</h4>
+                <span>Years of Excellence</span>
+            </div>
+        </div>
+        <div class="about-text">
+            <span class="section-subtitle">About Us</span>
+            <h2 class="section-title">We Are Setting Standard in Research & Clinical Care</h2>
+            <p>Our hospital has been at the forefront of medical innovation for over a decade. we combine cutting-edge
+                technology with compassionate care to ensure the best outcomes for our patients.</p>
+
+            <ul class="about-features">
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> Professional Medical Staff</li>
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> 24/7 Emergency Support</li>
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> Advanced Diagnostic Lab</li>
+                <li><lucide-icon [name]="CheckCircle"></lucide-icon> Fair Treatment Cost</li>
+            </ul>
+
+            <a href="#" class="btn btn-primary">Learn More</a>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="services section light-bg">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-subtitle">Our Services</span>
+            <h2 class="section-title">Specialized Medical Services</h2>
+        </div>
+
+        <div class="services-grid">
+            @for (service of services; track $index) {
+            <div class="service-card">
+                <div class="service-icon">
+                    <lucide-icon [name]="service.icon"></lucide-icon>
+                </div>
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+                <a href="#" class="read-more">Read More <lucide-icon [name]="ArrowRight"></lucide-icon></a>
+            </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="contact" class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col about-col">
+                <div class="logo">
+                    <lucide-icon [name]="Heart" class="logo-icon"></lucide-icon>
+                    <span class="logo-text">Hope<span>Medical</span></span>
+                </div>
+                <p>Leading the way in medical excellence, we provide comprehensive healthcare services with
+                    state-of-the-art facilities.</p>
+                <div class="social-links">
+                    <a href="#"><lucide-icon [name]="Facebook"></lucide-icon></a>
+                    <a href="#"><lucide-icon [name]="Twitter"></lucide-icon></a>
+                    <a href="#"><lucide-icon [name]="Instagram"></lucide-icon></a>
+                    <a href="#"><lucide-icon [name]="Linkedin"></lucide-icon></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#">Doctors</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <ul class="contact-info">
+                    <li><lucide-icon [name]="MapPin"></lucide-icon> 123 Healthcare Ave, NY</li>
+                    <li><lucide-icon [name]="Phone"></lucide-icon> +1 (555) 123-4567</li>
+                    <li><lucide-icon [name]="Mail"></lucide-icon> info&#64;hopemedical.com</li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Working Hours</h4>
+                <ul class="hours">
+                    <li><span>Mon - Fri:</span> 8:00 - 20:00</li>
+                    <li><span>Saturday:</span> 9:00 - 18:00</li>
+                    <li><span>Sunday:</span> Emergency Only</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Hope Medical Center. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,126 @@
+<div class="dashboard-wrapper">
+    <header class="dashboard-header">
+        <div class="welcome-text">
+            <h1>Dashboard Overview</h1>
+            <p>Welcome back, Dr. Sarah. Here's what's happening today.</p>
+        </div>
+        <div class="actions">
+            <button mat-flat-button color="primary">
+                <lucide-icon [name]="Calendar" size="18" class="btn-icon"></lucide-icon>
+                Schedule Appointment
+            </button>
+        </div>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        @for (stat of statsCards; track $index) {
+        <mat-card class="stat-card">
+            <div class="card-content">
+                <div class="icon-wrapper" [style.background-color]="stat.color + '15'" [style.color]="stat.color">
+                    <lucide-icon [name]="stat.icon" size="24"></lucide-icon>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-title">{{ stat.title }}</span>
+                    <div class="value-row">
+                        <h2 class="stat-value">{{ stat.value }}</h2>
+                        <span class="stat-trend" [class.negative]="stat.trend.startsWith('-')">{{ stat.trend }}</span>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+        }
+    </div>
+
+    <div class="charts-grid">
+        <!-- Admission Breakdown -->
+        <mat-card class="chart-card large">
+            <mat-card-header>
+                <mat-card-title>Admission Breakdown</mat-card-title>
+                <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <lucide-icon [name]="MoreVertical" size="18"></lucide-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <apx-chart [series]="admissionChartOptions.series" [chart]="admissionChartOptions.chart"
+                    [xaxis]="admissionChartOptions.xaxis" [colors]="admissionChartOptions.colors"
+                    [plotOptions]="admissionChartOptions.plotOptions" [legend]="admissionChartOptions.legend"
+                    [fill]="admissionChartOptions.fill"></apx-chart>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Patient by Division -->
+        <mat-card class="chart-card">
+            <mat-card-header>
+                <mat-card-title>Patient by Division</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <apx-chart [series]="patientChartOptions.series" [chart]="patientChartOptions.chart"
+                    [labels]="patientChartOptions.labels" [colors]="patientChartOptions.colors"
+                    [legend]="patientChartOptions.legend"></apx-chart>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <div class="bottom-grid">
+        <!-- Upcoming Appointments -->
+        <mat-card class="data-card">
+            <mat-card-header>
+                <mat-card-title>Upcoming Appointments</mat-card-title>
+                <button mat-button color="primary">View All</button>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="appointment-list">
+                    @for (apt of upcomingAppointments; track $index) {
+                    <div class="appointment-item">
+                        <div class="apt-time">{{ apt.time }}</div>
+                        <div class="apt-info">
+                            <span class="patient-name">{{ apt.patient }}</span>
+                            <span class="apt-type">{{ apt.type }}</span>
+                        </div>
+                        <div class="apt-doctor">{{ apt.doctor }}</div>
+                        <div class="apt-status">
+                            <span class="status-badge" [class]="apt.type.toLowerCase()"></span>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Doctor of the Month -->
+        <mat-card class="doctor-card featured">
+            <div class="featured-badge">Featured Doctor</div>
+            <div class="doctor-profile">
+                <div class="doctor-avatar">
+                    <img src="assets/about-img.png" alt="Doctor">
+                </div>
+                <h3>Dr. Robert Wilson</h3>
+                <p>Neurologist • Senior Consultant</p>
+                <div class="rating">
+                    @for (i of [1,2,3,4,5]; track $index) {
+                    <lucide-icon [name]="Star" size="16" class="star"></lucide-icon>
+                    }
+                    <span>4.9 (124 reviews)</span>
+                </div>
+            </div>
+            <div class="achievements">
+                <div class="achievement">
+                    <span class="count">250+</span>
+                    <span class="label">Operations</span>
+                </div>
+                <div class="achievement">
+                    <span class="count">98%</span>
+                    <span class="label">Success</span>
+                </div>
+            </div>
+            <button mat-flat-button class="profile-btn">View Full Profile</button>
+        </mat-card>
+    </div>
+</div>
+
+<mat-menu #menu="matMenu">
+    <button mat-menu-item>Weekly</button>
+    <button mat-menu-item>Monthly</button>
+    <button mat-menu-item>Yearly</button>
+</mat-menu>

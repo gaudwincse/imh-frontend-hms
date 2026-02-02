@@ -1,0 +1,17 @@
+.app-footer {
+    background: #fff !important;
+    color: #64748b !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.03);
+    font-size: 14px;
+    font-weight: 500;
+    height: 48px !important;
+    min-height: 48px !important;
+
+    .footer-spacer {
+        flex: 1 1 auto;
+    }
+
+    span {
+        opacity: 0.8;
+    }
+}

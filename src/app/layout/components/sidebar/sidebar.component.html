@@ -1,0 +1,78 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+    <div class="sidebar-header">
+        <div class="logo">
+            <div class="logo-icon">H</div>
+            @if (!isCollapsed) {
+            <span class="logo-text">BrightDental</span>
+            }
+        </div>
+    </div>
+
+    <div class="sidebar-content">
+        <nav class="menu-nav">
+            @if (!isCollapsed) {
+            <div class="menu-label">Main Menu</div>
+            }
+            <ul class="menu-list">
+                @for (item of menuItems; track $index) {
+                <li>
+                    <!-- Standard Link -->
+                    @if (!item.children) {
+                    <a [routerLink]="item.route" routerLinkActive="active" class="menu-item">
+                        <lucide-icon [name]="item.icon" size="20" class="menu-icon"></lucide-icon>
+                        @if (!isCollapsed) {
+                        <span class="menu-name">{{ item.name }}</span>
+                        }
+                    </a>
+                    }
+
+                    <!-- Dropdown Parent -->
+                    @if (item.children) {
+                    <div class="menu-item has-children" [class.expanded]="item.expanded" (click)="toggleSubmenu(item)">
+                        <lucide-icon [name]="item.icon" size="20" class="menu-icon"></lucide-icon>
+                        @if (!isCollapsed) {
+                        <span class="menu-name">{{ item.name }}</span>
+                        }
+                        @if (!isCollapsed) {
+                        <lucide-icon [name]="ChevronRight" size="16" class="arrow-icon"
+                            [class.rotate]="item.expanded"></lucide-icon>
+                        }
+                    </div>
+                    }
+
+                    <!-- Nested Children -->
+                    @if (item.children && item.expanded && !isCollapsed) {
+                    <ul class="submenu">
+                        @for (child of item.children; track $index) {
+                        <li>
+                            <a [routerLink]="child.route" routerLinkActive="active" class="menu-item child-item">
+                                <span class="dot"></span>
+                                <span class="menu-name">{{ child.name }}</span>
+                            </a>
+                        </li>
+                        }
+                    </ul>
+                    }
+                </li>
+                }
+            </ul>
+        </nav>
+    </div>
+
+    <div class="sidebar-footer">
+        <nav class="menu-nav">
+            <ul class="menu-list">
+                @for (item of bottomMenuItems; track $index) {
+                <li>
+                    <a [routerLink]="item.route" routerLinkActive="active" class="menu-item tertiary">
+                        <lucide-icon [name]="item.icon" size="20" class="menu-icon"></lucide-icon>
+                        @if (!isCollapsed) {
+                        <span class="menu-name">{{ item.name }}</span>
+                        }
+                    </a>
+                </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</aside>

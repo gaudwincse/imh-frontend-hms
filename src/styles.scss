@@ -1,0 +1,50 @@
+/* You can add global styles to this file, and also import other style files */
+
+@use '@angular/material' as mat;
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html,
+body {
+    height: 100%;
+}
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #a7f3d0 0%, #34d399 100%); // Mint Green
+    --secondary-gradient: linear-gradient(135deg, #7dd3fc 0%, #0ea5e9 100%); // Sky Blue
+    --accent-gradient: linear-gradient(135deg, #c4b5fd 0%, #8b5cf6 100%); // Soft Purple
+    --vibrant-gradient: linear-gradient(90deg, #dbeafe 0%, #f0f9ff 100%); // Very light blue/white
+    --bg-light: #f8fafc;
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: var(--bg-light);
+    color: #1e293b;
+}
+
+// Global scrollbar styling
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

@@ -1,0 +1,402 @@
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .welcome-text {
+            h1 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 700;
+                color: #1e293b;
+            }
+
+            p {
+                margin: 4px 0 0;
+                color: #64748b;
+                font-size: 14px;
+            }
+        }
+
+        button[mat-flat-button][color="primary"] {
+            background: var(--primary-gradient);
+            color: #0f172a;
+            font-weight: 600;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(52, 211, 153, 0.15);
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+        }
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+
+        .stat-card {
+            border-radius: 20px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            background: #fff;
+
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+            }
+
+            .card-content {
+                padding: 24px;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+
+                .icon-wrapper {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .stat-info {
+                    display: flex;
+                    flex-direction: column;
+
+                    .stat-title {
+                        font-size: 14px;
+                        font-weight: 500;
+                        color: #64748b;
+                        margin-bottom: 4px;
+                    }
+
+                    .value-row {
+                        display: flex;
+                        align-items: baseline;
+                        gap: 8px;
+
+                        .stat-value {
+                            margin: 0;
+                            font-size: 22px;
+                            font-weight: 700;
+                            color: #1e293b;
+                        }
+
+                        .stat-trend {
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: #10b981;
+
+                            &.negative {
+                                color: #ef4444;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-card {
+            border-radius: 20px;
+            padding: 24px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            background: #fff;
+            width: 100%;
+            overflow: hidden;
+
+            mat-card-header {
+                margin-bottom: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                mat-card-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1e293b;
+                }
+            }
+
+            mat-card-content {
+                padding: 0 !important;
+                width: 100%;
+
+                apx-chart {
+                    width: 100% !important;
+                    display: block;
+                }
+            }
+        }
+    }
+
+    .bottom-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr;
+        }
+
+        .data-card {
+            border-radius: 16px;
+            padding: 12px;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+            mat-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+
+                mat-card-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1e293b;
+                }
+            }
+
+            .appointment-list {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+
+                .appointment-item {
+                    display: grid;
+                    grid-template-columns: 80px 1fr 120px 40px;
+                    align-items: center;
+                    padding: 12px;
+                    background: #f8fafc;
+                    border-radius: 12px;
+                    gap: 16px;
+
+                    .apt-time {
+                        font-weight: 600;
+                        color: #2563eb;
+                        font-size: 13px;
+                    }
+
+                    .apt-info {
+                        display: flex;
+                        flex-direction: column;
+
+                        .patient-name {
+                            font-weight: 600;
+                            color: #1e293b;
+                            font-size: 14px;
+                        }
+
+                        .apt-type {
+                            font-size: 12px;
+                            color: #64748b;
+                        }
+                    }
+
+                    .apt-doctor {
+                        font-size: 14px;
+                        color: #475569;
+                    }
+
+                    .status-badge {
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        background: #cbd5e1;
+
+                        &.emergency {
+                            background: #ef4444;
+                        }
+
+                        &.checkup {
+                            background: #10b981;
+                        }
+
+                        &.consultation {
+                            background: #3b82f6;
+                        }
+
+                        &.report {
+                            background: #f59e0b;
+                        }
+                    }
+                }
+            }
+        }
+
+        .doctor-card {
+            border-radius: 20px;
+            padding: 24px;
+            background: var(--primary-bg);
+            background: var(--primary-gradient);
+            color: #0f172a; // High-contrast dark text
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: none;
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: -50px;
+                right: -50px;
+                width: 150px;
+                height: 150px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 50%;
+            }
+
+            .featured-badge {
+                background: rgba(15, 23, 42, 0.1); // Darker tint for better definition on light gradient
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 700;
+                margin-bottom: 24px;
+                backdrop-filter: blur(4px);
+                color: #0f172a;
+            }
+
+            .doctor-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 24px;
+                overflow: hidden;
+                border: 3px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 16px;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+
+            h3 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+            p {
+                margin: 4px 0 16px;
+                font-size: 14px;
+                color: #94a3b8;
+            }
+
+            .rating {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                color: #f59e0b;
+                font-size: 12px;
+                margin-bottom: 24px;
+
+                span {
+                    color: #0f172a;
+                    margin-left: 8px;
+                    font-weight: 600;
+                }
+            }
+
+            .achievements {
+                display: flex;
+                gap: 32px;
+                margin-bottom: 32px;
+
+                .achievement {
+                    display: flex;
+                    flex-direction: column;
+
+                    .count {
+                        font-size: 18px;
+                        font-weight: 700;
+                    }
+
+                    .label {
+                        font-size: 12px;
+                        color: #475569; // Darker slate for readability
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .profile-btn {
+                width: 100%;
+                background: #fff;
+                color: #1e293b;
+                font-weight: 600;
+                border-radius: 12px;
+                height: 44px;
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        gap: 16px;
+
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+
+            .welcome-text h1 {
+                font-size: 20px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .bottom-grid .data-card .appointment-list .appointment-item {
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+
+            .apt-time {
+                grid-column: 1;
+            }
+
+            .apt-info {
+                grid-column: 1;
+            }
+
+            .apt-doctor {
+                grid-column: 1;
+                font-size: 12px;
+            }
+
+            .status-badge {
+                grid-column: 2;
+                grid-row: 1 / span 3;
+            }
+        }
+    }
+}

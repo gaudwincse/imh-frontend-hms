@@ -1,0 +1,16 @@
+<div class="layout-container" [class.sidebar-collapsed]="isSidebarCollapsed">
+  @if (!isSidebarCollapsed) {
+  <div class="sidebar-overlay" (click)="toggleSidebar()"></div>
+  }
+  <app-sidebar [isCollapsed]="isSidebarCollapsed"></app-sidebar>
+
+  <div class="main-wrapper">
+    <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+
+    <main class="content-area">
+      <router-outlet></router-outlet>
+    </main>
+
+    <app-footer></app-footer>
+  </div>
+</div>
