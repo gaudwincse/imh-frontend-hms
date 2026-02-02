@@ -1,198 +1,181 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { LucideAngularModule, Shield, User, LogIn } from 'lucide-angular';
+import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService, LoginCredentials, LoginResponse } from '../../core/services/auth.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
-  styleUrls: ['./admin-login.component.scss'],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatIconModule
+  ],
   template: `
     <div class="login-container">
-      <div class="login-wrapper">
-        <!-- Header -->
-        <div class="login-header">
-          <div class="header-icon">
-            <lucide-icon [name]="Shield"></lucide-icon>
-          </div>
-          <h1>Super <span>Admin</span></h1>
-          <p class="subtitle">
-            Sign in to access Hospital Management System
-          </p>
-        </div>
+      <mat-card class="login-card">
+        <mat-card-header>
+          <mat-card-title class="login-title">Admin Login</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email or Mobile</mat-label>
+              <input matInput formControlName="login" placeholder="Enter email or mobile">
+              <mat-error *ngIf="loginForm.get('login')?.hasError('required')">
+                Email or mobile is required
+              </mat-error>
+            </mat-form-field>
 
-        <!-- Login Form -->
-        <div class="login-card">
-          <form [formGroup]="adminLoginForm" (ngSubmit)="onSubmit()">
-            <!-- Email Input -->
-            <div class="form-group">
-              <label for="email">Admin Email</label>
-              <div class="input-wrapper">
-                <input
-                  id="email"
-                  type="email"
-                  formControlName="email"
-                  autocomplete="email"
-                  placeholder="admin@hms.com"
-                  [attr.aria-invalid]="isFieldInvalid('email')"
-                  [ngClass]="{'ng-invalid ng-touched': isFieldInvalid('email')}"
-                >
-              </div>
-              @if (isFieldInvalid('email')) {
-                <span class="field-error">Please enter a valid admin email</span>
-              }
-            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" formControlName="password" placeholder="Enter password">
+              <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+                Password is required
+              </mat-error>
+            </mat-form-field>
 
-            <!-- Password Input -->
-            <div class="form-group">
-              <label for="password">Password</label>
-              <div class="input-wrapper">
-                <input
-                  id="password"
-                  type="password"
-                  formControlName="password"
-                  autocomplete="current-password"
-                  placeholder="Enter your password"
-                  [attr.aria-invalid]="isFieldInvalid('password')"
-                  [ngClass]="{'ng-invalid ng-touched': isFieldInvalid('password')}"
-                >
-              </div>
-              @if (isFieldInvalid('password')) {
-                <span class="field-error">Password is required</span>
-              }
-            </div>
-
-            <!-- Error Alert -->
-            @if (errorMessage()) {
-              <div class="error-alert">
-                <lucide-icon [name]="Shield"></lucide-icon>
-                <div class="error-content">
-                  <h3>Authentication Failed</h3>
-                  <p>{{ errorMessage() }}</p>
-                </div>
-              </div>
-            }
-
-            <!-- Form Options (Remember Me & Forgot Password) -->
-            <div class="form-options">
-              <div class="checkbox-group">
-                <input
-                  id="remember-me"
-                  type="checkbox"
-                  formControlName="rememberMe"
-                >
-                <label for="remember-me">Remember me</label>
-              </div>
-
-              <div class="forgot-password">
-                <a href="#">Forgot password?</a>
-              </div>
-            </div>
-
-            <!-- Submit Button -->
-            <button
-              type="submit"
-              [disabled]="isLoading()"
-              class="submit-btn"
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit" 
+              class="login-btn"
+              [disabled]="loginForm.invalid || isLoading()"
             >
-              @if (!isLoading()) {
-                <span>
-                  <lucide-icon [name]="LogIn"></lucide-icon>
-                  Sign in to Admin Panel
-                </span>
-              } @else {
-                <span>
-                  <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Authenticating...
-                </span>
-              }
+              <mat-spinner *ngIf="isLoading()" diameter="20"></mat-spinner>
+              <span *ngIf="!isLoading()">Login</span>
             </button>
           </form>
-        </div>
 
-        <!-- Footer -->
-        <div class="login-footer">
-          <p class="footer-text">Protected Administrator Access</p>
-          <div class="alt-links">
-            <a href="/login">Staff Login</a>
-            <a href="/">Patient Portal</a>
+          <div class="error-message" *ngIf="errorMessage()">
+            <mat-icon color="warn">error</mat-icon>
+            <span>{{ errorMessage() }}</span>
           </div>
-        </div>
-      </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-  `
+  `,
+  styles: [`
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .login-title {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .full-width {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .login-btn {
+      width: 100%;
+      height: 48px;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background-color: #ffebee;
+      border-radius: 4px;
+      color: #c62828;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+  `]
 })
 export class AdminLoginComponent implements OnInit {
-  readonly Shield = Shield;
-  readonly User = User;
-  readonly LogIn = LogIn;
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  adminLoginForm: FormGroup;
-  isLoading = signal(false);
+  loginForm: FormGroup = this.fb.group({});
+  isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.adminLoginForm = this.fb.group({
-      email: ['admin@hms.com', [Validators.required, Validators.email]],
-      password: ['admin123', [Validators.required]],
-      rememberMe: [false]
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      login: ['', [Validators.required]],
+      password: ['', [Validators.required]]
     });
   }
 
-  ngOnInit() {
-    // Check if already logged in as admin
-    if (this.authService.isAuthenticated() && this.authService.isAdmin()) {
-      this.router.navigate(['/admin/dashboard']);
-    }
-  }
-
-  onSubmit() {
-    if (this.adminLoginForm.invalid) {
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.adminLoginForm.controls).forEach(key => {
-        this.adminLoginForm.get(key)?.markAsTouched();
-      });
+  onSubmit(): void {
+    if (this.loginForm.invalid || this.isLoading()) {
       return;
     }
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const credentials = {
-      login: this.adminLoginForm.value.email,
-      password: this.adminLoginForm.value.password
+    const credentials: LoginCredentials = {
+      login: this.loginForm.value.login,
+      password: this.loginForm.value.password
     };
 
+    console.log('🔐 Attempting login with:', credentials);
+
     this.authService.login(credentials).subscribe({
-      next: (response) => {
+      next: (response: LoginResponse) => {
         this.isLoading.set(false);
+        
         if (response.access_token && response.user) {
-          // Redirect to admin dashboard
-          this.router.navigate(['/admin/dashboard']);
+          console.log('✅ Login successful, redirecting...');
+          
+          // Check if user is admin and redirect accordingly
+          if (this.authService.isAdmin()) {
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         } else {
-          this.errorMessage.set('Login failed');
+          this.errorMessage.set('Login failed: Invalid response');
         }
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'Login failed. Please try again.');
-        console.error('Admin login error:', err);
+        console.error('❌ Login error:', err);
+        
+        const message = err.error?.message || 
+                       err.error?.error || 
+                       'Login failed. Please check your credentials.';
+        this.errorMessage.set(message);
       }
     });
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.adminLoginForm.get(fieldName);
-    return field ? (field.invalid && field.touched) : false;
   }
 }

@@ -12,9 +12,29 @@ export const branchInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn
 ) => {
   const branchContext = inject(BranchContextService);
-  const branchId = branchContext.activeBranchId();
+  let branchId = branchContext.activeBranchId();
 
+  // If no branch context set, try to get default from user data
   if (!branchId) {
+    const userStr = localStorage.getItem('auth_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      const defaultBranch = user.branches?.find((b: any) => b.is_default);
+      if (defaultBranch) {
+        branchId = defaultBranch.id;
+        console.log(`🏢 Using default branch ${branchId} for API request`);
+      }
+    }
+    
+    // Fallback to branch 1 if still no branch
+    if (!branchId) {
+      branchId = 1;
+      console.log(`🏢 Using fallback branch 1 for API request`);
+    }
+  }
+
+  // Skip branch header for auth endpoints
+  if (req.url.includes('/api/auth/')) {
     return next(req);
   }
 

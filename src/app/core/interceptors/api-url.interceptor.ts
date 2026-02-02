@@ -1,4 +1,5 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 export const apiUrlInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
@@ -7,8 +8,9 @@ export const apiUrlInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next
     const apiReq = req.clone({
       url: `${environment.backendUrl}${req.url}`
     });
+    console.log(`🌐 API URL interceptor: ${req.url} -> ${apiReq.url}`);
     return next(apiReq);
   }
-  
+
   return next(req);
 };

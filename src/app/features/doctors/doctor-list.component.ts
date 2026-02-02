@@ -1,298 +1,350 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { DoctorService, Doctor, DoctorSearchParams } from '../../core/services/doctor.service';
 import { AuthService } from '../../core/services/auth.service';
-import { DoctorProfileModalComponent } from './doctor-profile-modal.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-    selector: 'app-doctor-list',
-    standalone: true,
-    imports: [CommonModule, FormsModule, DoctorProfileModalComponent],
-    styleUrls: ['./doctor-list.component.scss'],
-    template: `
-    <div class="container">
-      <!-- Header -->
-      <div class="header-section">
-        <h1>Doctor <span>Directory</span></h1>
-        <button
-          *ngIf="canManageDoctors()"
-          class="btn-add-doctor">
-          ➕ Add New Doctor
-        </button>
-      </div>
+  selector: 'app-doctor-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatButtonModule,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatProgressBarModule
+  ],
+  template: `
+    <div class="doctor-list-container">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Doctors</mat-card-title>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" (click)="refreshData()">
+              <mat-icon>refresh</mat-icon>
+              Refresh
+            </button>
+            <button 
+              mat-raised-button 
+              color="accent" 
+              (click)="createDoctor()"
+              *ngIf="authService.hasPermission('create_doctors')"
+            >
+              <mat-icon>add</mat-icon>
+              Add Doctor
+            </button>
+          </mat-card-actions>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <!-- Loading Indicator -->
+          <mat-progress-bar 
+            *ngIf="loading()" 
+            mode="indeterminate"
+            class="loading-indicator"
+          ></mat-progress-bar>
 
-      <!-- Search and Filters -->
-      <div class="search-filters">
-        <div class="filters-grid">
-          <input
-            type="text"
-            placeholder="Search doctors..."
-            class="search-input"
-            [(ngModel)]="searchQuery"
-            (keyup.enter)="search()">
-
-          <select
-            class="filter-select"
-            [(ngModel)]="filters.specialization"
-            (change)="search()">
-            <option value="">All Specializations</option>
-            <option *ngFor="let spec of specializations()" [value]="spec">{{ spec }}</option>
-          </select>
-
-          <select
-            class="filter-select"
-            [(ngModel)]="filters.status"
-            (change)="search()">
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="on_leave">On Leave</option>
-            <option value="resigned">Resigned</option>
-          </select>
-
-          <div class="checkbox-wrapper">
-            <input
-              type="checkbox"
-              id="available_today"
-              [(ngModel)]="filters.available_today"
-              (change)="search()">
-            <label for="available_today">Available Today</label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Loading State -->
-      <div *ngIf="loading()" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading doctors...</p>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="error()" class="error-alert">
-        <p>{{ error() }}</p>
-      </div>
-
-      <!-- Doctors Grid -->
-      <div *ngIf="!loading() && !error()" class="doctors-grid">
-        <div *ngFor="let doctor of doctors(); trackBy: trackByDoctorId"
-             class="doctor-card"
-             (click)="viewDoctor(doctor.id)">
-          <div class="card-content">
-            <!-- Doctor Header -->
-            <div class="doctor-header">
-              <div class="doctor-avatar">
-                {{ (doctor.user?.name?.charAt(0) || 'D').toUpperCase() }}
-              </div>
-              <div class="doctor-info">
-                <h3>{{ doctor.user?.name || 'Unknown' }}</h3>
-                <p>{{ doctor.employee_no }}</p>
-              </div>
-            </div>
-
-            <!-- Doctor Details -->
-            <div class="doctor-details">
-              <div class="detail-item">
-                <span class="label">Specialty</span>
-                <span class="value">{{ doctor.specialization }}</span>
-              </div>
-
-              <div class="detail-item">
-                <span class="label">Experience</span>
-                <span class="value">{{ doctor.experience_years }} yrs</span>
-              </div>
-
-              <div class="detail-item">
-                <span class="label">Consultation</span>
-                <span class="value">{{ doctor.consultation_fee }}</span>
-              </div>
-
-              <div class="detail-item">
-                <span class="label">Branch</span>
-                <span class="value">{{ doctor.branch?.name || '-' }}</span>
-              </div>
-            </div>
-
-            <!-- Available Days -->
-            <div *ngIf="doctor.available_days && doctor.available_days.length > 0" class="available-days">
-              <span class="label">Available Days</span>
-              <div class="days-list">
-                <span *ngFor="let day of doctor.available_days"
-                      class="day-tag">
-                  {{ day.charAt(0).toUpperCase() + day.slice(1, 3) }}
-                </span>
-              </div>
-            </div>
+          <!-- Error Display -->
+          <div class="error-message" *ngIf="error()">
+            <mat-icon color="warn">error</mat-icon>
+            <span>{{ error() }}</span>
           </div>
 
-            <!-- Footer -->
-            <div class="doctor-footer">
-              <span class="status-badge"
-                    [ngClass]="doctor.status === 'active' ? 'active' : doctor.status === 'on_leave' ? 'on-leave' : 'resigned'">
-                {{ doctor.status.replace('_', ' ') }}
-              </span>
+          <!-- Filters -->
+          <div class="filters-section">
+            <mat-form-field appearance="outline">
+              <mat-label>Search</mat-label>
+              <input matInput (keyup)="applyFilters()" placeholder="Search doctors...">
+            </mat-form-field>
 
-              <button (click)="viewProfile(doctor, $event)"
-                      class="btn-view-profile">
-                View Profile →
-              </button>
-            </div>
-        </div>
-      </div>
+            <mat-form-field appearance="outline">
+              <mat-label>Specialization</mat-label>
+              <mat-select (selectionChange)="applyFilters()">
+                <mat-option value="">All Specializations</mat-option>
+                <mat-option *ngFor="let spec of specializations()" [value]="spec">
+                  {{ spec }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
 
-      <!-- Empty State -->
-      <div *ngIf="!loading() && !error() && doctors().length === 0" class="empty-state">
-        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-        </svg>
-        <h3>No doctors found</h3>
-        <p>Try adjusting your search filters.</p>
-      </div>
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select (selectionChange)="applyFilters()">
+                <mat-option value="">All Status</mat-option>
+                <mat-option value="active">Active</mat-option>
+                <mat-option value="on_leave">On Leave</mat-option>
+                <mat-option value="resigned">Resigned</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
 
-      <!-- Pagination -->
-      <div *ngIf="meta().total > 0" class="pagination">
-        <div class="pagination-info">
-          Showing <span class="highlight">{{ (meta().current_page - 1) * meta().per_page + 1 }}</span> to
-          <span class="highlight">{{ getToNumber() }}</span> of
-          <span class="highlight">{{ meta().total }}</span> doctors
-        </div>
-        <div class="pagination-buttons">
-          <button
-            class="btn-pagination"
-            [disabled]="meta().current_page === 1"
-            (click)="previousPage()">
-            ← Previous
-          </button>
-          <button
-            class="btn-pagination"
-            [disabled]="meta().current_page === meta().last_page"
-            (click)="nextPage()">
-            Next →
-          </button>
-        </div>
-      </div>
+          <!-- Doctors Table -->
+          <div class="table-container">
+            <table mat-table [dataSource]="doctors()">
+              <ng-container matColumnDef="employee_no">
+                <th mat-header-cell *matHeaderCellDef>Employee No</th>
+                <td mat-cell *matCellDef="let doctor">{{ doctor.employee_no }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let doctor">
+                  {{ doctor.user?.name || 'N/A' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="specialization">
+                <th mat-header-cell *matHeaderCellDef>Specialization</th>
+                <td mat-cell *matCellDef="let doctor">{{ doctor.specialization }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="qualification">
+                <th mat-header-cell *matHeaderCellDef>Qualification</th>
+                <td mat-cell *matCellDef="let doctor">{{ doctor.qualification }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let doctor">
+                  <span class="status-badge" [ngClass]="doctor.status">
+                    {{ doctor.status?.replace('_', ' ') || 'Unknown' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let doctor">
+                  <button mat-icon-button color="primary" (click)="viewDoctor(doctor.id)">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button 
+                    mat-icon-button 
+                    color="accent" 
+                    (click)="editDoctor(doctor.id)"
+                    *ngIf="authService.hasPermission('update_doctors')"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button 
+                    mat-icon-button 
+                    color="warn" 
+                    (click)="deleteDoctor(doctor.id)"
+                    *ngIf="authService.hasPermission('delete_doctors')"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-
-    <!-- Doctor Profile Modal -->
-    <app-doctor-profile-modal [doctor]="selectedDoctor" (close)="onProfileClosed()"></app-doctor-profile-modal>
   `,
+  styles: [`
+    .doctor-list-container {
+      padding: 1rem;
+    }
+
+    .loading-indicator {
+      margin-bottom: 1rem;
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background-color: #ffebee;
+      border-radius: 4px;
+      color: #c62828;
+    }
+
+    .filters-section {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filters-section mat-form-field {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    .status-badge.on_leave {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+
+    .status-badge.resigned {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    mat-card-header {
+      margin-bottom: 1rem;
+    }
+
+    mat-card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  `]
 })
 export class DoctorListComponent implements OnInit {
+  private doctorService = inject(DoctorService);
+  public authService = inject(AuthService);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+
   doctors = signal<Doctor[]>([]);
-  meta = signal<any>({ current_page: 1, last_page: 1, per_page: 15, total: 0 });
-  loading = signal(false);
-  error = signal<string | null>(null);
   specializations = signal<string[]>([]);
-  searchQuery = '';
-  selectedDoctor: Doctor | null = null;
-  filters: DoctorSearchParams = {
-    per_page: 12,
-    specialization: undefined,
-    status: undefined,
-    available_today: false
-  };
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
 
-  constructor(
-    private doctorService: DoctorService,
-    private authService: AuthService
-  ) {}
+  displayedColumns = [
+    'employee_no',
+    'name', 
+    'specialization',
+    'qualification',
+    'status',
+    'actions'
+  ];
 
-  ngOnInit() {
+  ngOnInit(): void {
+    console.log('👨‍⚕️ DoctorListComponent initialized');
+    this.checkAuthentication();
+    this.loadData();
+  }
+
+  private checkAuthentication(): void {
+    if (!this.authService.isLoggedIn()) {
+      console.error('❌ User not authenticated, redirecting to login...');
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    if (!this.authService.hasPermission('view_doctors')) {
+      console.error('❌ User lacks permission to view doctors');
+      this.snackBar.open('You do not have permission to view doctors', 'Close', {
+        duration: 3000
+      });
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+
+    console.log('✅ Authentication and permissions verified');
+  }
+
+  private loadData(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    // Load data in parallel
     this.loadSpecializations();
     this.loadDoctors();
   }
 
-  loadSpecializations() {
+  loadSpecializations(): void {
     this.doctorService.getSpecializations().subscribe({
       next: (response) => {
-        this.specializations.set(response.data);
+        this.specializations.set(response.data || []);
+        console.log('📋 Specializations loaded:', response.data);
       },
       error: (err) => {
-        console.error('Error loading specializations:', err);
+        console.error('❌ Error loading specializations:', err);
+        this.snackBar.open('Failed to load specializations', 'Close', {
+          duration: 3000
+        });
       }
     });
   }
 
-  loadDoctors(page = 1) {
-    this.loading.set(true);
-    this.error.set(null);
-
-    const params: DoctorSearchParams = {
-      ...this.filters,
-      page,
-      per_page: this.filters.per_page!
-    };
-
-    if (this.searchQuery) {
-      params.search = this.searchQuery;
-    }
-
+  loadDoctors(params?: DoctorSearchParams): void {
     this.doctorService.getDoctors(params).subscribe({
       next: (response) => {
-        this.doctors.set(response.data);
-        this.meta.set(response.meta);
+        this.doctors.set(response.data || []);
         this.loading.set(false);
+        console.log('👨‍⚕️ Doctors loaded:', response.data?.length || 0);
       },
       error: (err) => {
-        this.error.set('Failed to load doctors. Please try again.');
         this.loading.set(false);
-        console.error('Error loading doctors:', err);
+        this.error.set('Failed to load doctors');
+        console.error('❌ Error loading doctors:', err);
+        
+        if (err.status === 401) {
+          console.error('❌ 401 Unauthorized - may need to re-login');
+          this.snackBar.open('Session expired. Please login again.', 'Close', {
+            duration: 3000
+          });
+        }
       }
     });
   }
 
-  search() {
-    this.loadDoctors(1);
+  applyFilters(): void {
+    // Implement filter logic based on form values
+    const filters: DoctorSearchParams = {};
+    this.loadDoctors(filters);
   }
 
-  nextPage() {
-    if (this.meta().current_page < this.meta().last_page) {
-      this.loadDoctors(this.meta().current_page + 1);
-    }
+  refreshData(): void {
+    console.log('🔄 Refreshing doctor data...');
+    this.loadData();
   }
 
-  previousPage() {
-    if (this.meta().current_page > 1) {
-      this.loadDoctors(this.meta().current_page - 1);
-    }
+  viewDoctor(id: number): void {
+    this.router.navigate(['/doctors', id]);
   }
 
-  viewDoctor(id: number) {
-    // TODO: Navigate to doctor detail view
-    console.log('View doctor:', id);
+  editDoctor(id: number): void {
+    this.router.navigate(['/doctors', id, 'edit']);
   }
 
-  viewProfile(doctor: Doctor, event: Event) {
-    event.stopPropagation();
-    this.selectedDoctor = doctor;
-
-    // Use setTimeout to ensure the modal component is rendered
-    setTimeout(() => {
-      const modal = document.querySelector('app-doctor-profile-modal') as any;
-      if (modal && modal.show) {
-        modal.show(doctor);
-      }
-    }, 0);
+  createDoctor(): void {
+    this.router.navigate(['/doctors', 'create']);
   }
 
-  onProfileClosed() {
-    this.selectedDoctor = null;
-  }
-
-  canManageDoctors() {
-    const user = this.authService.getCurrentUser();
-    return user?.permissions?.includes('create_doctors') || user?.permissions?.includes('manage_users');
-  }
-
-  trackByDoctorId(index: number, doctor: Doctor) {
-    return doctor.id;
-  }
-
-  getToNumber(): number {
-    const current = this.meta().current_page;
-    const perPage = this.meta().per_page;
-    const total = this.meta().total;
-    const to = current * perPage;
-    return to > total ? total : to;
+  deleteDoctor(id: number): void {
+    // Implement delete confirmation and logic
+    console.log('🗑️ Delete doctor:', id);
   }
 }
