@@ -64,15 +64,11 @@ export class AdminLoginComponent implements OnInit {
       password: this.loginForm.value.password,
     };
 
-    console.log('🔐 Attempting login with:', credentials);
-
     this.authService.login(credentials).subscribe({
       next: (response: LoginResponse) => {
         this.isLoading.set(false);
 
         if (response.access_token && response.user) {
-          console.log('✅ Login successful, redirecting...');
-
           // Check if user is admin and redirect accordingly
           if (this.authService.isAdmin()) {
             this.router.navigate(['/admin/dashboard']);
@@ -85,8 +81,6 @@ export class AdminLoginComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        console.error('❌ Login error:', err);
-
         const message =
           err.error?.message ||
           err.error?.error ||

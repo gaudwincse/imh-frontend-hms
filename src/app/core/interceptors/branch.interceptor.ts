@@ -22,14 +22,12 @@ export const branchInterceptor: HttpInterceptorFn = (
       const defaultBranch = user.branches?.find((b: any) => b.is_default);
       if (defaultBranch) {
         branchId = defaultBranch.id;
-        console.log(`🏢 Using default branch ${branchId} for API request`);
       }
     }
-    
+
     // Fallback to branch 1 if still no branch
     if (!branchId) {
       branchId = 1;
-      console.log(`🏢 Using fallback branch 1 for API request`);
     }
   }
 

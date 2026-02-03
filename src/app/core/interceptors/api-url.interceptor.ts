@@ -8,7 +8,6 @@ export const apiUrlInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next
     const apiReq = req.clone({
       url: `${environment.backendUrl}${req.url}`
     });
-    console.log(`🌐 API URL interceptor: ${req.url} -> ${apiReq.url}`);
     return next(apiReq);
   }
 

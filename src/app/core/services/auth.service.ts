@@ -96,20 +96,15 @@ export class AuthService {
           localStorage.setItem('auth_token', response.access_token);
           localStorage.setItem('auth_user', JSON.stringify(response.user));
           localStorage.setItem('auth_expiry', expiryTime.toString());
-
-          console.log('✅ Login successful - Token stored');
         }
       }),
       catchError((error: HttpErrorResponse) => {
-        console.error('❌ Login failed:', error);
         return throwError(() => error);
       })
     );
   }
 
   logout(redirectUrl: string = '/auth/login'): void {
-    console.log('🚪 Logging out...');
-
     // Clear signals
     this.tokenSignal.set(null);
     this.userSignal.set(null);

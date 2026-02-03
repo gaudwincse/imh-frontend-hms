@@ -3,11 +3,11 @@ import { LandingComponent } from './features/landing/landing.component';
 import { DentalLandingComponent } from './features/dental-landing/dental-landing.component';
 import { LayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { DoctorListComponent } from './features/doctors/doctor-list.component';
+import { DoctorListComponent } from './features/doctors/doctor-list/doctor-list.component';
 import { PatientListComponent } from './features/patients/patient-list.component';
 import { AppointmentListComponent } from './features/appointments/appointment-list.component';
 import { LoginComponent } from './features/auth/login/login.component';
-import { AddDoctorComponent } from './features/doctors/add-doctor.component';
+import { AddDoctorComponent } from './features/doctors/add-doctor/add-doctor.component';
 
 export const routes: Routes = [
     { path: '', component: DentalLandingComponent },

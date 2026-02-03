@@ -23,16 +23,33 @@ export interface Doctor {
   id: number;
   employee_no: string;
   user: User;
+  mobilde_no?: string;
   specialization: string;
   specialization_id?: number;
+  license_number: string;
   qualification: string;
   experience_years: number;
   consultation_fee: number;
   available_days?: string[];
   slot_duration_minutes: number;
   branch: Branch;
+  working_hours: DoctorSchedule;
   branch_id: number;
   status: 'active' | 'on_leave' | 'resigned';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DoctorSchedule {
+  id: number;
+  doctor_id: number;
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+  break_start: string;
+  break_end: string;
+  is_active: boolean;
+  max_appointments: number;
   created_at: string;
   updated_at: string;
 }

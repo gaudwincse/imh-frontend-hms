@@ -4,6 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export interface CreateUserRequest {
+  first_name: string;
+  last_name: string;
   name: string;
   email: string;
   password: string;
@@ -14,6 +16,8 @@ export interface CreateUserRequest {
 
 export interface User {
   id: number;
+  first_name: string;
+  last_name: string;
   name: string;
   email: string;
   phone?: string;
