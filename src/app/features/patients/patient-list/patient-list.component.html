@@ -1,0 +1,130 @@
+<div class="doctor-list-container">
+  <mat-card>
+    <mat-card-header>
+      <div class="header-container">
+        <mat-card-title>Patients</mat-card-title>
+
+        <div class="button-group">
+          <button mat-raised-button color="primary">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+          </button>
+
+          @if (authService.hasPermission("create_patients")) {
+            <button
+              mat-raised-button
+              color="accent"
+              (click)="navigateToAddPatient()"
+            >
+              <mat-icon>add</mat-icon>
+              Add Patient
+            </button>
+          }
+        </div>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loading()) {
+        <mat-progress-bar
+          *ngIf="loading()"
+          mode="indeterminate"
+          class="loading-indicator"
+        ></mat-progress-bar>
+      }
+
+      <!-- Error Display -->
+      @if (error()) {
+        <div class="error-message">
+          <mat-icon color="warn">error</mat-icon>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <div class="filters-section">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <input
+            matInput
+            (keyup)="applyFilters()"
+            placeholder="Search doctors..."
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>All Status</mat-label>
+          <mat-select (selectionChange)="applyFilters()">
+            <mat-option value="">Select Status</mat-option>
+            <mat-option value="active">Active</mat-option>
+            <mat-option value="inactive">Inactive</mat-option>
+            <mat-option value="deceased">Deceased</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>All Genders</mat-label>
+          <mat-select (selectionChange)="applyFilters()">
+            <mat-option value="">Select Gender</mat-option>
+            <mat-option value="male">Male</mat-option>
+            <mat-option value="female">Female</mat-option>
+            <mat-option value="other">Other</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <!-- Patient List Table -->
+      <div class="table-container">
+        <table mat-table [dataSource]="patients()" class="mat-elevation-z8">
+          <ng-container matColumnDef="patient_no">
+            <th mat-header-cell *matHeaderCellDef>Patient No</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.patient_no }}</td>
+          </ng-container>
+          <ng-container matColumnDef="first_name">
+            <th mat-header-cell *matHeaderCellDef>First Name</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.first_name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="last_name">
+            <th mat-header-cell *matHeaderCellDef>Last Name</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.last_name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="gender">
+            <th mat-header-cell *matHeaderCellDef>Gender</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.gender }}</td>
+          </ng-container>
+          <ng-container matColumnDef="age">
+            <th mat-header-cell *matHeaderCellDef>Age</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.age }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let patient">{{ patient.status }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let patient">
+              <button mat-icon-button color="primary" aria-label="View Patient">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td
+              class="mat-cell"
+              [attr.colspan]="displayedColumns.length"
+              style="text-align: center; padding: 20px"
+            >
+              No records found.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="paginator-container">
+        <mat-paginator [length]="total()" [pageSize]="perPage()" [pageSizeOptions]="[10, 20, 50]"
+          (page)="onPageChange($event)">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

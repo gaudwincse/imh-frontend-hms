@@ -19,10 +19,11 @@ export interface AuthUser {
 }
 
 export interface LoginResponse {
-  access_token?: string;
-  token_type?: string;
-  expires_in?: number;
-  user?: AuthUser;
+  access_token: string;
+  token_type: string;
+  refresh_token: string;
+  expires_in: number;
+  user: AuthUser;
 }
 
 export interface LoginCredentials {
@@ -34,6 +35,18 @@ export interface LoginCredentials {
   providedIn: 'root',
 })
 export class AuthService {
+  private readonly API = '/api/auth';
+
+  private _accessToken = signal<string | null>(localStorage.getItem('token'));
+  private _refreshToken = signal<string | null>(localStorage.getItem('refresh_token'));
+  private _expiresAt = signal<number>(
+    Number(localStorage.getItem('expires_at'))
+  );
+
+  readonly isAuthenticated = computed(() =>
+    !!this._accessToken() && Date.now() < this._expiresAt()
+  );
+
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
 
@@ -79,6 +92,23 @@ export class AuthService {
         this.logout();
       }
     }
+  }
+
+  storeSession(data: LoginResponse) {
+    const expiresAt = Date.now() + data.expires_in * 1000;
+
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+    localStorage.setItem('expires_at', expiresAt.toString());
+
+    this._accessToken.set(data.access_token);
+    this._refreshToken.set(data.refresh_token);
+    this._expiresAt.set(expiresAt);
+  }
+
+  storeToken(token: string) {
+    localStorage.setItem('token', token);
+    this._accessToken.set(token);
   }
 
   login(credentials: LoginCredentials) {

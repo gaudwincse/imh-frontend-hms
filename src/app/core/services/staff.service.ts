@@ -6,7 +6,7 @@ export interface Staff {
   id: number;
   user_id: number;
   employee_no: string;
-  staff_type: 'nurse' | 'lab_technician' | 'administrator' | 'pharmacist' | 'accountant';
+  role_id: number;
   department_id?: number;
   branch_id: number;
   shift: 'morning' | 'afternoon' | 'night' | 'rotating';
@@ -30,7 +30,7 @@ export interface Staff {
 
 export interface StaffSearchParams {
   search?: string;
-  staff_type?: 'nurse' | 'lab_technician' | 'administrator' | 'pharmacist' | 'accountant';
+  role_id?: number;
   status?: 'active' | 'on_leave' | 'resigned';
   department_id?: number;
   branch_id?: number;
@@ -50,7 +50,7 @@ export interface PaginatedResponse<T> {
 
 export interface CreateStaffData {
   user_id: number;
-  staff_type: 'nurse' | 'lab_technician' | 'administrator' | 'pharmacist' | 'accountant';
+  role_id: number;
   department_id?: number;
   branch_id: number;
   shift?: 'morning' | 'afternoon' | 'night' | 'rotating';
@@ -58,7 +58,7 @@ export interface CreateStaffData {
 }
 
 export interface StaffType {
-  value: string;
+  value: number;
   label: string;
 }
 

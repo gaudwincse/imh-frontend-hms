@@ -33,6 +33,7 @@ export interface Patient {
 }
 
 export interface PatientSearchParams {
+  [key: string]: string | number | undefined;
   query?: string;
   first_name?: string;
   last_name?: string;

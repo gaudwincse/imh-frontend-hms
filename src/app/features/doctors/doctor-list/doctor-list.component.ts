@@ -9,7 +9,7 @@ import {
 import { AuthService } from '../../../core/services/auth.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -45,6 +45,10 @@ export class DoctorListComponent implements OnInit {
   specializations = signal<string[]>([]);
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
+
+  total = signal<number>(0);
+  page = signal<number>(1);
+  perPage = signal<number>(10);
 
   displayedColumns = [
     'employee_no',
@@ -157,5 +161,11 @@ export class DoctorListComponent implements OnInit {
   deleteDoctor(id: number): void {
     // Implement delete confirmation and logic
     console.log('🗑️ Delete doctor:', id);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.page.set(event.pageIndex + 1);
+    this.perPage.set(event.pageSize);
+    this.loadDoctors();
   }
 }
